@@ -8,10 +8,14 @@
 		<dependency>
 			<groupId>com.github.JPDSousa</groupId>
 			<artifactId>rookit-utils</artifactId>
-  	</dependency>
+		</dependency>
 		<dependency>
 			<groupId>com.github.JPDSousa</groupId>
 			<artifactId>rookit-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.JPDSousa</groupId>
+			<artifactId>ExtendedCLI</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -24,6 +28,11 @@
 			<dependency>
 				<groupId>com.github.JPDSousa</groupId>
 				<artifactId>rookit-mongodb</artifactId>
+				<version>-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.JPDSousa</groupId>
+				<artifactId>ExtendedCLI</artifactId>
 				<version>-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
