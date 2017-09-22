@@ -1,4 +1,4 @@
-package org.rookit.core;
+package org.rookit.core.config;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -46,12 +46,13 @@ public class Config {
 	
 	private static final Gson buildGson() {
 		final GsonBuilder builder = new GsonBuilder();
+		builder.setPrettyPrinting();
 		return builder.create();
 	}
 	
 	private DatabaseConfig database;
 	
-	private ParsingConfig parsing;
+	private ParsingConfig parser;
 	
 	private Config() {}
 	
@@ -59,16 +60,8 @@ public class Config {
 		return database;
 	}
 
-	public void setDatabase(DatabaseConfig database) {
-		this.database = database;
-	}
-
 	public ParsingConfig getParsing() {
-		return parsing;
-	}
-
-	public void setParsing(ParsingConfig parsing) {
-		this.parsing = parsing;
+		return parser;
 	}
 
 	public class DatabaseConfig {
@@ -91,18 +84,16 @@ public class Config {
 		
 	}
 
-
-
 	public class ParsingConfig {
 		
-		private int parserLimit;
+		private int resultsLimit;
 	
 		public int getParserLimit() {
-			return parserLimit;
+			return resultsLimit;
 		}
 	
 		public void setParserLimit(int parserLimit) {
-			this.parserLimit = parserLimit;
+			this.resultsLimit = parserLimit;
 		}
 		
 		

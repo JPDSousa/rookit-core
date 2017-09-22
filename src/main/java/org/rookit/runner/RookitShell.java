@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import org.extendedCLI.command.CLIBuilder;
 import org.extendedCLI.command.ExtendedCLI;
 import org.extendedCLI.exceptions.NoSuchCommandException;
-import org.rookit.core.Config;
+import org.rookit.core.config.Config;
 import org.rookit.runner.actions.CoreAction;
 import org.rookit.utils.log.Logs;
 import org.rookit.utils.log.Validator;
