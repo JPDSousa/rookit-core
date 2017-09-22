@@ -35,8 +35,10 @@ public class RookitShell {
 	
 	private void start(BufferedReader reader) throws IOException, NoSuchCommandException {
 		String line;
+		System.out.print("Rookit>");
 		while((line = reader.readLine()) != null) {
 			execute(line);
+			System.out.print("Rookit>");
 		}
 		reader.close();
 	}
