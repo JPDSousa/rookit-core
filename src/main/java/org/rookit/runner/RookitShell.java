@@ -8,6 +8,7 @@ import org.extendedCLI.command.CLIBuilder;
 import org.extendedCLI.command.ExtendedCLI;
 import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.Config;
+import org.rookit.runner.actions.CoreAction;
 import org.rookit.utils.log.Logs;
 import org.rookit.utils.log.Validator;
 
@@ -19,9 +20,13 @@ public class RookitShell {
 	private final ExtendedCLI cli;
 	
 	private RookitShell(Config configuration) {
+		VALIDATOR.info("[...] Loading actions");
 		final CLIBuilder builder = new CLIBuilder(false);
-		
+		for(CoreAction action : CoreAction.values()) {
+			builder.registerCommand(action.name(), action.getAction());
+		}
 		cli = builder.build();
+		VALIDATOR.info("[ok] Loading actions");
 	}
 	
 	private void execute(String input) throws NoSuchCommandException {
