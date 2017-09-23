@@ -13,11 +13,14 @@ import org.extendedCLI.command.ExtendedCommandLine;
 import org.rookit.core.stream.TPGResult;
 import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
+import org.rookit.core.utils.TrackPathNormalizer;
 import org.rookit.mongodb.DBManager;
 import org.rookit.dm.utils.PrintUtils;
 import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.TrackPath;
+
+import com.mpatric.mp3agic.NotSupportedException;
 
 @SuppressWarnings("javadoc")
 public class ImportAction extends AbstractCommand implements Command {
@@ -68,12 +71,14 @@ public class ImportAction extends AbstractCommand implements Command {
 			choice = Character.getNumericValue(input.readLine().charAt(0));
 			if(choice > 0){
 				finalResult = results.get(choice-1);
-				
+				new TrackPathNormalizer(source).removeTags();
 				db.addAlbum(finalResult.build());
 			}
 			System.out.println("\n");
 		} catch(IOException e) {
 			validator.handleIOException(e);
+		} catch (NotSupportedException e) {
+			e.printStackTrace();
 		}
 	}
 
