@@ -7,7 +7,7 @@ import org.extendedCLI.command.ExtendedCommandLine;
 @SuppressWarnings("javadoc")
 public class ListAction extends AbstractCommand implements Command {
 
-	protected ListAction() {
+	public ListAction() {
 		super(ListOptions.createArguments());
 	}
 

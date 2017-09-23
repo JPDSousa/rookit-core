@@ -3,10 +3,11 @@ package org.rookit.runner.actions;
 import org.extendedCLI.argument.Argument;
 import org.extendedCLI.argument.ArgumentEnum;
 import org.extendedCLI.argument.Arguments;
+import org.extendedCLI.argument.Requires;
 
 @SuppressWarnings("javadoc")
 public enum ImportOptions implements ArgumentEnum {
-	;
+	PATH(Argument.create("p", Requires.TRUE, "The content path to be imported."), 1);
 
 	private final Argument argument;
 	private final int groupId;
