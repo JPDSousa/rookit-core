@@ -59,6 +59,10 @@
 			<artifactId>ExtendedCLI</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.JPDSousa</groupId>
+			<artifactId>rookit-parser</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -91,6 +95,11 @@
 				<artifactId>junit</artifactId>
 				<version>4.12</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.JPDSousa</groupId>
+				<artifactId>rookit-parser</artifactId>
+				<version>-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
