@@ -8,7 +8,11 @@ import org.extendedCLI.command.CLIBuilder;
 import org.extendedCLI.command.ExtendedCLI;
 import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.config.Config;
-import org.rookit.runner.actions.CoreAction;
+import org.rookit.database.DBManager;
+import org.rookit.parser.formatlist.FormatList;
+import org.rookit.parser.formatlist.FormatListManager;
+import org.rookit.runner.actions.ImportAction;
+import org.rookit.runner.actions.ListAction;
 import org.rookit.utils.log.Logs;
 import org.rookit.utils.log.Validator;
 
@@ -16,15 +20,21 @@ import org.rookit.utils.log.Validator;
 public class RookitShell {
 	
 	private static final Validator VALIDATOR = new Validator(Logs.CORE);
+	
+	private static final String HOST = "localhost";
+	private static final int PORT = 27039;
+	private static final String DBNAME = "rookit";
 
 	private final ExtendedCLI cli;
 	
 	private RookitShell(Config configuration) {
+		final DBManager db = DBManager.open(HOST, PORT, DBNAME);
+		final FormatList list = FormatListManager.getManager().getDefault4Tracks();
 		VALIDATOR.info("[...] Loading actions");
 		final CLIBuilder builder = new CLIBuilder(false);
-		for(CoreAction action : CoreAction.values()) {
-			builder.registerCommand(action.name(), action.getAction());
-		}
+		
+		builder.registerCommand("import", new ImportAction(db, list));
+		builder.registerCommand("list", new ListAction());
 		cli = builder.build();
 		VALIDATOR.info("[ok] Loading actions");
 	}
