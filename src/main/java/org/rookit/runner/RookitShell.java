@@ -8,7 +8,7 @@ import org.extendedCLI.command.CLIBuilder;
 import org.extendedCLI.command.ExtendedCLI;
 import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.config.Config;
-import org.rookit.database.DBManager;
+import org.rookit.mongodb.DBManager;
 import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.formatlist.FormatListManager;
 import org.rookit.runner.actions.ImportAction;

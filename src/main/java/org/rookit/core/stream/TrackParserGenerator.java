@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.rookit.core.utils.CoreValidator;
-import org.rookit.database.DBManager;
+import org.rookit.mongodb.DBManager;
 import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.parser.FormatParser;
 import org.rookit.parser.parser.Parser;

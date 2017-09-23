@@ -13,7 +13,7 @@ import org.extendedCLI.command.ExtendedCommandLine;
 import org.rookit.core.stream.TPGResult;
 import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
-import org.rookit.database.DBManager;
+import org.rookit.mongodb.DBManager;
 import org.rookit.dm.utils.PrintUtils;
 import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
@@ -68,6 +68,7 @@ public class ImportAction extends AbstractCommand implements Command {
 			choice = Character.getNumericValue(input.readLine().charAt(0));
 			if(choice > 0){
 				finalResult = results.get(choice-1);
+				
 				db.addAlbum(finalResult.build());
 			}
 			System.out.println("\n");
