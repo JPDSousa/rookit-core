@@ -20,8 +20,6 @@ import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.TrackPath;
 
-import com.mpatric.mp3agic.NotSupportedException;
-
 @SuppressWarnings("javadoc")
 public class ImportAction extends AbstractCommand implements Command {
 	
@@ -77,8 +75,6 @@ public class ImportAction extends AbstractCommand implements Command {
 			System.out.println("\n");
 		} catch(IOException e) {
 			validator.handleIOException(e);
-		} catch (NotSupportedException e) {
-			e.printStackTrace();
 		}
 	}
 
