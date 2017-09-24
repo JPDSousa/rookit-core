@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.rookit.core.utils.CoreValidator;
 import org.rookit.mongodb.DBManager;
 import org.rookit.parser.formatlist.FormatList;
@@ -44,10 +45,11 @@ import org.rookit.utils.builder.StreamGenerator;
 
 
 @SuppressWarnings("javadoc")
-public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, 
-Parser<TrackPath, SingleTrackAlbumBuilder>, 
-AutoCloseable {
+public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, Parser<TrackPath, SingleTrackAlbumBuilder>, AutoCloseable {
 
+	// TODO move to config
+	private static final int LIMIT = 5;
+	
 	private final CoreValidator validator;
 
 	private Stream<TPGResult> stream;
@@ -117,12 +119,16 @@ AutoCloseable {
 
 	@Override
 	public Iterable<SingleTrackAlbumBuilder> parseAll(TrackPath arg0) {
-		return parser.parseAll(arg0);
+		return limit(parser.parseAll(arg0), LIMIT);
 	}
 
 	@Override
 	public <O extends Result<?>> Iterable<SingleTrackAlbumBuilder> parseAll(TrackPath arg0, O arg1) {
-		return parser.parseAll(arg0, arg1);
+		return limit(parser.parseAll(arg0, arg1), LIMIT);
+	}
+	
+	private Iterable<SingleTrackAlbumBuilder> limit(Iterable<SingleTrackAlbumBuilder> results, int limit) {
+		return IterableUtils.boundedIterable(results, limit);
 	}
 
 }
