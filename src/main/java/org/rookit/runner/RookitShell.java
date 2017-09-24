@@ -33,13 +33,17 @@ public class RookitShell {
 	// TODO [end] move to configs
 
 	private final ExtendedCLI cli;
+	private final BufferedReader reader;
 	
-	private RookitShell(Config configuration) throws IOException {
+	private RookitShell(Config configuration, BufferedReader reader) throws IOException {
+		this.reader = reader;
 		final DBManager db = DBManager.open(HOST, PORT, DBNAME);
 		db.init();
 		final FormatList list = FormatList.readFromPath(FL_PATH);
 		VALIDATOR.info("[...] Loading actions");
 		final CLIBuilder builder = new CLIBuilder(true);
+		builder.setInput(reader);
+		builder.setOutput(System.out);
 		
 		builder.registerCommand("import", new ImportAction(db, list));
 		builder.registerCommand("list", new ListAction());
@@ -55,7 +59,7 @@ public class RookitShell {
 		}
 	}
 	
-	private void start(BufferedReader reader) throws IOException {
+	private void start() throws IOException {
 		String line;
 		System.out.print("Rookit>");
 		while((line = reader.readLine()) != null) {
@@ -67,13 +71,13 @@ public class RookitShell {
 	
 	public static void main(String[] args) throws IOException {
 		final Config config = Config.read();
-		final RookitShell shell = new RookitShell(config);
+		final RookitShell shell = new RookitShell(config, new BufferedReader(new InputStreamReader(System.in)));
 		
 		if(args.length > 0) {
 			shell.execute(String.join(" ", args));
 		}
 		else {
-			shell.start(new BufferedReader(new InputStreamReader(System.in)));
+			shell.start();
 		}
 	}
 
