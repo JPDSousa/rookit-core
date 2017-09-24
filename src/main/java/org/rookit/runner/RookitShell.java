@@ -36,9 +36,10 @@ public class RookitShell {
 	
 	private RookitShell(Config configuration) throws IOException {
 		final DBManager db = DBManager.open(HOST, PORT, DBNAME);
+		db.init();
 		final FormatList list = FormatList.readFromPath(FL_PATH);
 		VALIDATOR.info("[...] Loading actions");
-		final CLIBuilder builder = new CLIBuilder(false);
+		final CLIBuilder builder = new CLIBuilder(true);
 		
 		builder.registerCommand("import", new ImportAction(db, list));
 		builder.registerCommand("list", new ListAction());
@@ -46,11 +47,15 @@ public class RookitShell {
 		VALIDATOR.info("[ok] Loading actions");
 	}
 	
-	private void execute(String input) throws NoSuchCommandException {
-		cli.execute(input);
+	private void execute(String input) {
+		try {
+			cli.execute(input);
+		} catch (NoSuchCommandException e) {
+			System.out.println("Unkown Command.");
+		}
 	}
 	
-	private void start(BufferedReader reader) throws IOException, NoSuchCommandException {
+	private void start(BufferedReader reader) throws IOException {
 		String line;
 		System.out.print("Rookit>");
 		while((line = reader.readLine()) != null) {
@@ -60,7 +65,7 @@ public class RookitShell {
 		reader.close();
 	}
 	
-	public static void main(String[] args) throws NoSuchCommandException, IOException {
+	public static void main(String[] args) throws IOException {
 		final Config config = Config.read();
 		final RookitShell shell = new RookitShell(config);
 		
