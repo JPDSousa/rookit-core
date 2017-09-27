@@ -19,7 +19,10 @@ import com.google.gson.stream.JsonWriter;
 @SuppressWarnings("javadoc")
 public class ConfigTest {
 	
-	private static final Path CONFIG_DUMMY_PATH = Resources.RESOURCES_TEST.resolve("config").resolve("config.json");
+	private static final Path CONFIG_DIR = Resources.RESOURCES_TEST.resolve("config");
+	private static final Path CONFIG_DUMMY_PATH = CONFIG_DIR.resolve("config.json");
+	private static final Path CONFIG_EMPTY_PATH = CONFIG_DIR.resolve("empty.json");
+	
 	
 	private static final String DRIVER_NAME = "rookit-monogdb";
 	private static final int PARSER_LIMIT = 5;
@@ -55,6 +58,19 @@ public class ConfigTest {
 		Config.update(config, CONFIG_DUMMY_PATH);
 		final int actual = Config.read(CONFIG_DUMMY_PATH).getParsing().getParserLimit();
 		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public final void testDefaults() throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+		final Config config = Config.read(CONFIG_EMPTY_PATH);
+		assertNotNull(config);
+		final DatabaseConfig dbConfig = config.getDatabase();
+		final ParsingConfig parseConfig = config.getParsing();
+		assertNotNull(dbConfig);
+		assertNotNull(parseConfig);
+		assertNotNull(dbConfig.getDriverName());
+		assertNotNull(dbConfig.getOptions());
+		assertTrue(parseConfig.getParserLimit() > 0);
 	}
 
 }
