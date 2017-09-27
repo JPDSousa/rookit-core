@@ -1,12 +1,8 @@
 package org.rookit.core.config;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 import org.rookit.utils.resource.Resources;
 
