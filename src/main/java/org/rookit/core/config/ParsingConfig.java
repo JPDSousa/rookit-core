@@ -27,7 +27,7 @@ public class ParsingConfig {
 	}
 
 	public Path getFormatsPath() {
-		return getOrDefault(Paths.get(formatsPath), DEFAULT_FORMATS);
+		return getOrDefault(formatsPath, DEFAULT_FORMATS, formatsPath -> Paths.get(formatsPath));
 	}
 
 	public void setFormatsPath(Path formatsPath) {

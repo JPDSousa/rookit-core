@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.function.Function;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,6 +39,10 @@ final class ConfigUtils {
 	
 	static <T> T getOrDefault(T get, T def) {
 		return get != null ? get : def;
+	}
+	
+	static <T, E> T getOrDefault(E get, T def, Function<E, T> mapper) {
+		return get != null ? mapper.apply(get) : def;
 	}
 
 }

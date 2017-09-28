@@ -1,0 +1,14 @@
+{
+	"database":{
+		"driverName":"rookit-monogdb", 
+		"options": {
+			"host": "localhost",
+			"port": "27039",
+			"db_name": "rookit"
+		}
+	},
+	"parser":{
+		"resultsLimit":5,
+		"formatsPath": "src/main/resources/parser/formats.txt"
+	}
+}
