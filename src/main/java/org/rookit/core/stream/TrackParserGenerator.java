@@ -59,6 +59,9 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	public TrackParserGenerator(DBManager db, FormatList list, ParsingConfig config) {
 		super();
 		validator = CoreValidator.getDefault();
+		validator.checkArgumentNotNull(db, "The database cannot be null");
+		validator.checkArgumentNotNull(list, "Must provide a list of formats");
+		validator.checkArgumentNotNull(config, "The configuration cannot be null");
 		factory = ParserFactory.create();
 		this.parserLimit = config.getParserLimit();
 		this.parser = factory
