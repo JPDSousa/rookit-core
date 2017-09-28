@@ -3,7 +3,6 @@ package org.rookit.runner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.util.Map;
 
 import org.extendedCLI.command.CLIBuilder;
@@ -12,39 +11,35 @@ import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.config.Config;
 import org.rookit.core.config.DatabaseConfig;
 import org.rookit.mongodb.DBManager;
-import org.rookit.parser.formatlist.FormatList;
 import org.rookit.runner.actions.ImportAction;
 import org.rookit.runner.actions.ListAction;
 import org.rookit.utils.log.Logs;
 import org.rookit.utils.log.Validator;
-import org.rookit.utils.resource.Resources;
 
 @SuppressWarnings("javadoc")
 public class RookitShell {
 	
 	private static final Validator VALIDATOR = new Validator(Logs.CORE);
 	
-	private static final Path FL_PATH = Resources.RESOURCES_MAIN
-			.resolve("parser")
-			.resolve("formats.txt");
-	// TODO [end] move to configs
-
 	private final ExtendedCLI cli;
 	private final BufferedReader reader;
 	
-	private RookitShell(Config configuration, BufferedReader reader) throws IOException {
+	private RookitShell(Config configuration, BufferedReader reader) {
 		this.reader = reader;
 		final DBManager db = loadDatabase(configuration.getDatabase());
-		final FormatList list = FormatList.readFromPath(FL_PATH);
+		this.cli = buildCLI(db, configuration);
+		VALIDATOR.info("[ok] Loading actions");
+	}
+	
+	private ExtendedCLI buildCLI(DBManager db, Config config) {
 		VALIDATOR.info("[...] Loading actions");
 		final CLIBuilder builder = new CLIBuilder(true);
 		builder.setInput(reader);
 		builder.setOutput(System.out);
-		
-		builder.registerCommand("import", new ImportAction(db, list, configuration));
+		builder.registerCommand("import", new ImportAction(db, config));
 		builder.registerCommand("list", new ListAction());
-		cli = builder.build();
-		VALIDATOR.info("[ok] Loading actions");
+		return builder.build();
+		
 	}
 	
 	private DBManager loadDatabase(DatabaseConfig config) {

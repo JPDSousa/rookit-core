@@ -11,6 +11,7 @@ import org.extendedCLI.command.AbstractCommand;
 import org.extendedCLI.command.Command;
 import org.extendedCLI.command.ExtendedCommandLine;
 import org.rookit.core.config.Config;
+import org.rookit.core.config.ParsingConfig;
 import org.rookit.core.stream.TPGResult;
 import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
@@ -28,11 +29,21 @@ public class ImportAction extends AbstractCommand implements Command {
 	private final TrackParserGenerator parser;
 	private final DBManager db;
 	
-	public ImportAction(DBManager db, FormatList list, Config config) {
+	public ImportAction(DBManager db, Config config) {
 		super(ImportOptions.createArguments());
-		this.db = db;
 		validator = CoreValidator.getDefault();
-		parser = new TrackParserGenerator(db, list, config.getParsing());
+		this.db = db;
+		final ParsingConfig parsingConfig = config.getParsing();
+		parser = new TrackParserGenerator(db, readFormats(parsingConfig), parsingConfig);
+	}
+	
+	private FormatList readFormats(ParsingConfig config) {
+		try {
+			return FormatList.readFromPath(config.getFormatsPath());
+		} catch (IOException e) {
+			validator.handleIOException(e);
+			return null;
+		}
 	}
 
 	@Override

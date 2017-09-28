@@ -15,7 +15,6 @@ import org.rookit.parser.utils.TrackPath;
 import org.rookit.utils.resource.Resources;
 
 import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.NotSupportedException;
 
 @SuppressWarnings("javadoc")
 public class TrackPathNormalizerTest {
@@ -49,7 +48,7 @@ public class TrackPathNormalizerTest {
 	}
 
 	@Test
-	public final void testRemoveTags() throws NotSupportedException, IOException {
+	public final void testRemoveTags() {
 		labRat.removeTags();
 		assertNotEquals(originalTrack, testTrack);
 		final Mp3File mp3 = testTrack.getMp3();
