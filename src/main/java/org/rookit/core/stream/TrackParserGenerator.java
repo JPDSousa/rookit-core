@@ -70,13 +70,15 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 
 	private TagParser createTagParser(DBManager db) {
 		final ParserConfiguration<TrackPath, SingleTrackAlbumBuilder> config = Parser.createConfiguration(SingleTrackAlbumBuilder.class);
-		config.withDBConnection(db);
+		config.withDBConnection(db)
+		.withDbStorage(true);
 		return factory.newTagParser(config);
 	}
 
 	private FormatParser createFormatParser(DBManager db, FormatList list) {
 		final ParserConfiguration<String, SingleTrackAlbumBuilder> config = Parser.createConfiguration(SingleTrackAlbumBuilder.class);
 		config.withDBConnection(db)
+		.withDbStorage(true)
 		.withTrackFormats(list.getAll().collect(Collectors.toList()))
 		.withLimit(6);
 		return factory.newFormatParser(config);
