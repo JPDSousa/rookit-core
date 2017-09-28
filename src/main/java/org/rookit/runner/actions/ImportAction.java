@@ -73,7 +73,7 @@ public class ImportAction extends AbstractCommand implements Command {
 		final List<SingleTrackAlbumBuilder> results = result.getResults();
 		final SingleTrackAlbumBuilder finalResult;
 		try {
-			System.out.println("Parsing: " + source);
+			output.println("Parsing: " + source);
 			index = 1;
 			for(SingleTrackAlbumBuilder subRes : results){
 				printResult(index++, subRes);
@@ -83,19 +83,31 @@ public class ImportAction extends AbstractCommand implements Command {
 				finalResult = results.get(choice-1);
 				new TrackPathNormalizer(source).removeTags();
 				db.addAlbum(finalResult.build());
+				askForRemoval(source);
 			}
-			System.out.println("\n");
+			output.println("\n");
 		} catch(IOException e) {
 			validator.handleIOException(e);
 		}
 	}
 
-	private void printResult(int index, SingleTrackAlbumBuilder result) {
+	private void askForRemoval(TrackPath source) throws IOException {
+		String answer;
+		do {
+			output.println("Remove the file (y/n)?");
+			answer = input.readLine();
+			if(answer.equals("y")) {
+				Files.delete(source.getPath());
+			}
+		} while (!answer.equals("y") && !answer.equals("n"));
+	}
+
+	private void printResult(int index, SingleTrackAlbumBuilder result) throws IOException {
 		final StringBuilder builder = new StringBuilder().append(index)
 				.append(" :: ").append(result.getFormat())
 				.append(": [").append(result.getScore()).append("]\n")
 				.append(PrintUtils.track(result.getTrack()));
-		System.out.println(builder);
+		output.println(builder.toString());
 	}
 
 	@Override
