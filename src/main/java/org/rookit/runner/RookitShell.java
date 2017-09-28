@@ -4,11 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.extendedCLI.command.CLIBuilder;
 import org.extendedCLI.command.ExtendedCLI;
 import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.config.Config;
+import org.rookit.core.config.DatabaseConfig;
 import org.rookit.mongodb.DBManager;
 import org.rookit.parser.formatlist.FormatList;
 import org.rookit.runner.actions.ImportAction;
@@ -22,11 +24,6 @@ public class RookitShell {
 	
 	private static final Validator VALIDATOR = new Validator(Logs.CORE);
 	
-	//TODO [start] move to configs 
-	private static final String HOST = "localhost";
-	private static final int PORT = 27039;
-	private static final String DBNAME = "rookit";
-	
 	private static final Path FL_PATH = Resources.RESOURCES_MAIN
 			.resolve("parser")
 			.resolve("formats.txt");
@@ -37,18 +34,27 @@ public class RookitShell {
 	
 	private RookitShell(Config configuration, BufferedReader reader) throws IOException {
 		this.reader = reader;
-		final DBManager db = DBManager.open(HOST, PORT, DBNAME);
-		db.init();
+		final DBManager db = loadDatabase(configuration.getDatabase());
 		final FormatList list = FormatList.readFromPath(FL_PATH);
 		VALIDATOR.info("[...] Loading actions");
 		final CLIBuilder builder = new CLIBuilder(true);
 		builder.setInput(reader);
 		builder.setOutput(System.out);
 		
-		builder.registerCommand("import", new ImportAction(db, list));
+		builder.registerCommand("import", new ImportAction(db, list, configuration));
 		builder.registerCommand("list", new ListAction());
 		cli = builder.build();
 		VALIDATOR.info("[ok] Loading actions");
+	}
+	
+	private DBManager loadDatabase(DatabaseConfig config) {
+		final Map<String, String> options = config.getOptions();
+		final DBManager db = DBManager.open(
+				options.get("host"), 
+				Integer.valueOf(options.get("port")), 
+				options.get("db_name"));
+		db.init();
+		return db;
 	}
 	
 	private void execute(String input) {

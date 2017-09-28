@@ -10,6 +10,7 @@ import java.util.List;
 import org.extendedCLI.command.AbstractCommand;
 import org.extendedCLI.command.Command;
 import org.extendedCLI.command.ExtendedCommandLine;
+import org.rookit.core.config.Config;
 import org.rookit.core.stream.TPGResult;
 import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
@@ -27,11 +28,11 @@ public class ImportAction extends AbstractCommand implements Command {
 	private final TrackParserGenerator parser;
 	private final DBManager db;
 	
-	public ImportAction(DBManager db, FormatList list) {
+	public ImportAction(DBManager db, FormatList list, Config config) {
 		super(ImportOptions.createArguments());
 		this.db = db;
 		validator = CoreValidator.getDefault();
-		parser = new TrackParserGenerator(db, list);
+		parser = new TrackParserGenerator(db, list, config.getParsing());
 	}
 
 	@Override
