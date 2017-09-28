@@ -41,6 +41,7 @@ import org.rookit.parser.parser.TagParser;
 import org.rookit.parser.result.Result;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.DirectoryFilters;
+import org.rookit.parser.utils.PathUtils;
 import org.rookit.parser.utils.TrackPath;
 import org.rookit.utils.builder.StreamGenerator;
 
@@ -63,7 +64,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 		this.parser = factory
 				.newParserPipeline(TrackPath.class, SingleTrackAlbumBuilder.create())
 				.insert(createTagParser(db))
-				.mapInput(tp -> tp.getFileName())
+				.mapInput(tp -> PathUtils.getFileName(tp))
 				.insert(createFormatParser(db, list))
 				.build();
 	}
