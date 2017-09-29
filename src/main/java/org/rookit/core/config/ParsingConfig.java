@@ -19,7 +19,7 @@ public class ParsingConfig {
 	private String formatsPath;
 
 	public int getParserLimit() {
-		return getOrDefault(resultsLimit, DEFAULT_LIMIT);
+		return resultsLimit > 0 ? resultsLimit : DEFAULT_LIMIT;
 	}
 
 	public void setParserLimit(int parserLimit) {
