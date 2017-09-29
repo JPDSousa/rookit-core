@@ -18,7 +18,6 @@ import org.rookit.core.utils.CoreValidator;
 import org.rookit.core.utils.TrackPathNormalizer;
 import org.rookit.mongodb.DBManager;
 import org.rookit.dm.utils.PrintUtils;
-import org.rookit.parser.formatlist.FormatList;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.TrackPath;
 
@@ -34,16 +33,7 @@ public class ImportAction extends AbstractCommand implements Command {
 		validator = CoreValidator.getDefault();
 		this.db = db;
 		final ParsingConfig parsingConfig = config.getParsing();
-		parser = new TrackParserGenerator(db, readFormats(parsingConfig), parsingConfig);
-	}
-	
-	private FormatList readFormats(ParsingConfig config) {
-		try {
-			return FormatList.readFromPath(config.getFormatsPath());
-		} catch (IOException e) {
-			validator.handleIOException(e);
-			return null;
-		}
+		parser = new TrackParserGenerator(db, parsingConfig);
 	}
 
 	@Override
