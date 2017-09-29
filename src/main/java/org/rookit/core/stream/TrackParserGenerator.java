@@ -56,11 +56,10 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	private final ParserFactory factory;
 	private final int parserLimit;
 
-	public TrackParserGenerator(DBManager db, FormatList list, ParsingConfig config) {
+	public TrackParserGenerator(DBManager db, ParsingConfig config) {
 		super();
 		validator = CoreValidator.getDefault();
 		validator.checkArgumentNotNull(db, "The database cannot be null");
-		validator.checkArgumentNotNull(list, "Must provide a list of formats");
 		validator.checkArgumentNotNull(config, "The configuration cannot be null");
 		factory = ParserFactory.create();
 		this.parserLimit = config.getParserLimit();
@@ -68,7 +67,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 				.newParserPipeline(TrackPath.class, SingleTrackAlbumBuilder.create())
 				.insert(createTagParser(db))
 				.mapInput(tp -> PathUtils.getFileName(tp))
-				.insert(createFormatParser(db, list))
+				.insert(createFormatParser(db, config))
 				.build();
 	}
 
@@ -79,13 +78,23 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 		return factory.newTagParser(config);
 	}
 
-	private FormatParser createFormatParser(DBManager db, FormatList list) {
+	private FormatParser createFormatParser(DBManager db, ParsingConfig parsingConfig) {
+		final FormatList list = readFormats(parsingConfig);
 		final ParserConfiguration<String, SingleTrackAlbumBuilder> config = Parser.createConfiguration(SingleTrackAlbumBuilder.class);
 		config.withDBConnection(db)
 		.withDbStorage(true)
 		.withTrackFormats(list.getAll().collect(Collectors.toList()))
 		.withLimit(6);
 		return factory.newFormatParser(config);
+	}
+	
+	private FormatList readFormats(ParsingConfig config) {
+		try {
+			return FormatList.readFromPath(config.getFormatsPath());
+		} catch (IOException e) {
+			validator.handleIOException(e);
+			return null;
+		}
 	}
 
 	@Override
