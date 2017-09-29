@@ -17,6 +17,8 @@ import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
 import org.rookit.core.utils.TrackPathNormalizer;
 import org.rookit.mongodb.DBManager;
+import org.rookit.dm.parser.IgnoreField;
+import org.rookit.dm.parser.TrackFormat;
 import org.rookit.dm.utils.PrintUtils;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.TrackPath;
@@ -73,12 +75,18 @@ public class ImportAction extends AbstractCommand implements Command {
 				finalResult = results.get(choice-1);
 				new TrackPathNormalizer(source).removeTags();
 				db.addAlbum(finalResult.build());
+				updateHits(finalResult);
 				askForRemoval(source);
 			}
 			output.println("\n");
 		} catch(IOException e) {
 			validator.handleIOException(e);
 		}
+	}
+	
+	private void updateHits(SingleTrackAlbumBuilder result) {
+		result.getIgnored().forEach(i -> db.updateIgnored(IgnoreField.create(i)));
+		db.updateTrackFormat(TrackFormat.create(result.getFormat().toString()));
 	}
 
 	private void askForRemoval(TrackPath source) throws IOException {
