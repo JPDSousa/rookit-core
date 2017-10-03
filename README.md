@@ -1,6 +1,7 @@
 Rookit
 =======
 [![Known Vulnerabilities](https://snyk.io/test/github/jpdsousa/mongo-obj-framework/badge.svg)](https://snyk.io/test/github/jpdsousa/mongo-obj-framework)
+
 Rookit is the ultimate :notes: Music Library Manager :notes:.
 
 Features :headphones:
