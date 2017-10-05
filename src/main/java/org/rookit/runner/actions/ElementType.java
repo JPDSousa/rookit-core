@@ -14,7 +14,7 @@ enum ElementType {
 	GENRE;
 	
 	static final Argument getArgument() {
-		return Argument.create("t", 
+		return Argument.create("e", 
 				Requires.OPTIONAL, 
 				"Filters the type of elements taken into account", 
 				Arrays.stream(values()).map(ElementType::name).toArray(String[]::new), 
