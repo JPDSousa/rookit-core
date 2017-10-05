@@ -21,7 +21,7 @@ public class ListAction extends AbstractCommand implements Command {
 	
 	private static Pattern fromQuery(String query) {
 		final String quoted = Pattern.quote(query);
-		return Pattern.compile(".+("+quoted+")*", Pattern.CASE_INSENSITIVE);
+		return Pattern.compile(".*"+quoted, Pattern.CASE_INSENSITIVE);
 	}
 	
 	private final CoreValidator validator;
