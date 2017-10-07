@@ -9,6 +9,10 @@
 	},
 	"parser":{
 		"resultsLimit":3,
-		"formatsPath": "src/main/resources/parser/formats.txt"
+		"formatsPath": "src/main/resources/parser/formats.txt",
+		"filterNegatives": true,
+		"onSuccess": {
+			"remove": "ALWAYS"
+		}
 	}
 }
