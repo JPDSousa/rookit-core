@@ -12,6 +12,7 @@ import org.extendedCLI.command.Command;
 import org.extendedCLI.command.ExtendedCommandLine;
 import org.rookit.core.config.Config;
 import org.rookit.core.config.ParsingConfig;
+import org.rookit.core.config.ParsingConfig.OnSuccess.Remove;
 import org.rookit.core.stream.TPGResult;
 import org.rookit.core.stream.TrackParserGenerator;
 import org.rookit.core.utils.CoreValidator;
@@ -29,11 +30,13 @@ public class ImportAction extends AbstractCommand implements Command {
 	private final CoreValidator validator;
 	private final TrackParserGenerator parser;
 	private final DBManager db;
+	private final Config config;
 	
 	public ImportAction(DBManager db, Config config) {
 		super(ImportOptions.createArguments());
 		validator = CoreValidator.getDefault();
 		this.db = db;
+		this.config = config;
 		final ParsingConfig parsingConfig = config.getParsing();
 		parser = new TrackParserGenerator(db, parsingConfig);
 	}
@@ -95,14 +98,20 @@ public class ImportAction extends AbstractCommand implements Command {
 	}
 
 	private void askForRemoval(TrackPath source) throws IOException {
+		final Remove removeConfig = config.getParsing().getOnSuccess().getRemove();
 		String answer;
-		do {
-			output.println("Remove the file (y/n)?");
-			answer = input.readLine();
-			if(answer.equals("y")) {
-				Files.delete(source.getPath());
-			}
-		} while (!answer.equals("y") && !answer.equals("n"));
+		if(removeConfig == Remove.ALWAYS) {
+			Files.delete(source.getPath());
+		}
+		else if(removeConfig == Remove.ASK) {
+			do {
+				output.println("Remove the file (y/n)?");
+				answer = input.readLine();
+				if(answer.equals("y")) {
+					Files.delete(source.getPath());
+				}
+			} while (!answer.equals("y") && !answer.equals("n"));
+		}
 	}
 
 	private void printResult(int index, SingleTrackAlbumBuilder result) throws IOException {

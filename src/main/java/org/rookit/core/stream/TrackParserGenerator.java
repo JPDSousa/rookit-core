@@ -27,8 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import org.apache.commons.collections4.IterableUtils;
 import org.rookit.core.config.ParsingConfig;
 import org.rookit.core.utils.CoreValidator;
 import org.rookit.mongodb.DBManager;
@@ -54,7 +54,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	private Stream<TPGResult> stream;
 	private final Parser<TrackPath, SingleTrackAlbumBuilder> parser;
 	private final ParserFactory factory;
-	private final int parserLimit;
+	private final ParsingConfig config;
 
 	public TrackParserGenerator(DBManager db, ParsingConfig config) {
 		super();
@@ -62,7 +62,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 		validator.checkArgumentNotNull(db, "The database cannot be null");
 		validator.checkArgumentNotNull(config, "The configuration cannot be null");
 		factory = ParserFactory.create();
-		this.parserLimit = config.getParserLimit();
+		this.config = config;
 		this.parser = factory
 				.newParserPipeline(TrackPath.class, SingleTrackAlbumBuilder.create())
 				.insert(createTagParser(db))
@@ -134,16 +134,19 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 
 	@Override
 	public Iterable<SingleTrackAlbumBuilder> parseAll(TrackPath arg0) {
-		return limit(parser.parseAll(arg0), parserLimit);
+		return filter(parser.parseAll(arg0));
 	}
 
 	@Override
 	public <O extends Result<?>> Iterable<SingleTrackAlbumBuilder> parseAll(TrackPath arg0, O arg1) {
-		return limit(parser.parseAll(arg0, arg1), parserLimit);
+		return filter(parser.parseAll(arg0, arg1));
 	}
 	
-	private Iterable<SingleTrackAlbumBuilder> limit(Iterable<SingleTrackAlbumBuilder> results, int limit) {
-		return IterableUtils.boundedIterable(results, limit);
+	private Iterable<SingleTrackAlbumBuilder> filter(Iterable<SingleTrackAlbumBuilder> results) {
+		return StreamSupport.stream(results.spliterator(), false)
+				.filter(result -> !config.isFilterNegatives() || result.getScore() > 0)
+				.limit(config.getParserLimit())
+				.collect(Collectors.toList());
 	}
 
 }

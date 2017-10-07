@@ -17,6 +17,12 @@ public class ParsingConfig {
 	
 	private int resultsLimit;
 	private String formatsPath;
+	private boolean filterNegatives;
+	private OnSuccess onSuccess;
+	
+	public ParsingConfig() {
+		filterNegatives = true;
+	}
 
 	public int getParserLimit() {
 		return resultsLimit > 0 ? resultsLimit : DEFAULT_LIMIT;
@@ -32,6 +38,41 @@ public class ParsingConfig {
 
 	public void setFormatsPath(Path formatsPath) {
 		this.formatsPath = formatsPath.toString();
+	}
+	
+	public boolean isFilterNegatives() {
+		return filterNegatives;
+	}
+
+	public void setFilterNegatives(boolean filterNegatives) {
+		this.filterNegatives = filterNegatives;
+	}
+
+	public OnSuccess getOnSuccess() {
+		return getOrDefault(onSuccess, new OnSuccess());
+	}
+
+	public void setOnSuccess(OnSuccess onSuccess) {
+		this.onSuccess = onSuccess;
+	}
+
+	public static class OnSuccess {
+		
+		public enum Remove {
+			ALWAYS, ASK, NEVER
+		}
+		
+		private Remove remove;
+
+		public Remove getRemove() {
+			return getOrDefault(remove, Remove.ASK);
+		}
+
+		public void setRemove(Remove remove) {
+			this.remove = remove;
+		}
+		
+		
 	}
 	
 }

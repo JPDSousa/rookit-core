@@ -8,7 +8,11 @@
 		}
 	},
 	"parser":{
-		"resultsLimit":5,
-		"formatsPath": "src/main/resources/parser/formats.txt"
+		"resultsLimit":3,
+		"formatsPath": "src/main/resources/parser/formats.txt",
+		"filterNegatives": true,
+		"onSuccess": {
+			"remove": "ALWAYS"
+		}
 	}
 }
