@@ -8,7 +8,7 @@
 		}
 	},
 	"parser":{
-		"resultsLimit":5,
+		"resultsLimit":3,
 		"formatsPath": "src/main/resources/parser/formats.txt"
 	}
 }
