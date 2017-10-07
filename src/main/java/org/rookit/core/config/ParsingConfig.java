@@ -54,13 +54,17 @@ public class ParsingConfig {
 
 	public static class OnSuccess {
 		
-		private String remove;
+		public enum Remove {
+			ALWAYS, ASK, NEVER
+		}
+		
+		private Remove remove;
 
-		public String getRemove() {
-			return getOrDefault(remove, "ASK");
+		public Remove getRemove() {
+			return getOrDefault(remove, Remove.ASK);
 		}
 
-		public void setRemove(String remove) {
+		public void setRemove(Remove remove) {
 			this.remove = remove;
 		}
 		
