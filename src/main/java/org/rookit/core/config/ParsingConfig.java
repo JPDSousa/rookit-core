@@ -19,6 +19,10 @@ public class ParsingConfig {
 	private String formatsPath;
 	private boolean filterNegatives;
 	private OnSuccess onSuccess;
+	
+	public ParsingConfig() {
+		filterNegatives = true;
+	}
 
 	public int getParserLimit() {
 		return resultsLimit > 0 ? resultsLimit : DEFAULT_LIMIT;
