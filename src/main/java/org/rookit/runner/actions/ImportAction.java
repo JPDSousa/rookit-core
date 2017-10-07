@@ -70,13 +70,18 @@ public class ImportAction extends AbstractCommand implements Command {
 			for(SingleTrackAlbumBuilder subRes : results){
 				printResult(index++, subRes);
 			}
-			choice = Character.getNumericValue(input.readLine().charAt(0));
-			if(choice > 0){
-				finalResult = results.get(choice-1);
-				new TrackPathNormalizer(source).removeTags();
-				db.addAlbum(finalResult.build());
-				updateHits(finalResult);
-				askForRemoval(source);
+			if(!results.isEmpty()) {
+				choice = Character.getNumericValue(input.readLine().charAt(0));
+				if(choice > 0){
+					finalResult = results.get(choice-1);
+					new TrackPathNormalizer(source).removeTags();
+					db.addAlbum(finalResult.build());
+					updateHits(finalResult);
+					askForRemoval(source);
+				}
+			}
+			else {
+				output.println("No suitable format found! :(");
 			}
 			output.println("\n");
 		} catch(IOException e) {

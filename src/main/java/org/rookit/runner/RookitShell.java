@@ -37,7 +37,7 @@ public class RookitShell {
 		builder.setInput(reader);
 		builder.setOutput(System.out);
 		builder.registerCommand("import", new ImportAction(db, config));
-		builder.registerCommand("list", new ListAction());
+		builder.registerCommand("list", new ListAction(db));
 		return builder.build();
 		
 	}
