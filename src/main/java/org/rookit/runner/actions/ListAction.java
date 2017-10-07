@@ -47,6 +47,7 @@ public class ListAction extends AbstractCommand implements Command {
 		}
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	private void search(String query, ElementType e) {
 		try {
 			switch(e) {
@@ -61,10 +62,6 @@ public class ListAction extends AbstractCommand implements Command {
 				break;
 			case TRACK:
 				searchTrack(query);
-				break;
-			case ALL:
-			default:
-				// dead code
 				break;
 			}			
 		} catch(IOException ex) {
