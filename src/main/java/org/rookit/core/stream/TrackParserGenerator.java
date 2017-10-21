@@ -32,12 +32,11 @@ import java.util.stream.StreamSupport;
 import org.rookit.core.config.ParsingConfig;
 import org.rookit.core.utils.CoreValidator;
 import org.rookit.mongodb.DBManager;
+import org.rookit.parser.config.ParserConfiguration;
 import org.rookit.parser.formatlist.FormatList;
-import org.rookit.parser.parser.FormatParser;
 import org.rookit.parser.parser.Parser;
-import org.rookit.parser.parser.ParserConfiguration;
 import org.rookit.parser.parser.ParserFactory;
-import org.rookit.parser.parser.TagParser;
+import org.rookit.parser.parser.ParserPipeline;
 import org.rookit.parser.result.Result;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.DirectoryFilters;
@@ -55,6 +54,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	private final Parser<TrackPath, SingleTrackAlbumBuilder> parser;
 	private final ParserFactory factory;
 	private final ParsingConfig config;
+	private final ParserConfiguration parserConfig;
 
 	public TrackParserGenerator(DBManager db, ParsingConfig config) {
 		super();
@@ -63,29 +63,24 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 		validator.checkArgumentNotNull(config, "The configuration cannot be null");
 		factory = ParserFactory.create();
 		this.config = config;
-		this.parser = factory
+		this.parserConfig = buildParserConfig(db, config);
+		this.parser = buildParser(this.parserConfig);
+	}
+
+	private ParserPipeline<TrackPath, String, SingleTrackAlbumBuilder> buildParser(ParserConfiguration config) {
+		return factory
 				.newParserPipeline(TrackPath.class, SingleTrackAlbumBuilder.create())
-				.insert(createTagParser(db))
-				.mapInput(tp -> PathUtils.getFileName(tp))
-				.insert(createFormatParser(db, config))
-				.build();
+				.insert(factory.newTagParser(config))
+				.mapInput(PathUtils::getFileName)
+				.insert(factory.newFormatParser(config));
 	}
 
-	private TagParser createTagParser(DBManager db) {
-		final ParserConfiguration<TrackPath, SingleTrackAlbumBuilder> config = Parser.createConfiguration(SingleTrackAlbumBuilder.class);
-		config.withDBConnection(db)
-		.withDbStorage(true);
-		return factory.newTagParser(config);
-	}
-
-	private FormatParser createFormatParser(DBManager db, ParsingConfig parsingConfig) {
-		final FormatList list = readFormats(parsingConfig);
-		final ParserConfiguration<String, SingleTrackAlbumBuilder> config = Parser.createConfiguration(SingleTrackAlbumBuilder.class);
-		config.withDBConnection(db)
-		.withDbStorage(true)
-		.withTrackFormats(list.getAll().collect(Collectors.toList()))
-		.withLimit(6);
-		return factory.newFormatParser(config);
+	private ParserConfiguration buildParserConfig(DBManager db, ParsingConfig config) {
+		return Parser.createConfiguration(SingleTrackAlbumBuilder.class)
+				.withDBConnection(db)
+				.withDbStorage(true)
+				.withTrackFormats(readFormats(config).getAll().collect(Collectors.toList()))
+				.withLimit(config.getParserLimit());
 	}
 	
 	private FormatList readFormats(ParsingConfig config) {
@@ -104,7 +99,8 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 				.filter(DirectoryFilters.newTrackStreamFilter())
 				// TODO filter track by format
 				.map(p -> TrackPath.create(p))
-				.map(p -> new TPGResult(p, parseAll(p)));
+				.map(p -> new TPGResult(p, parseAll(p)))
+				.sorted((r1, r2) -> Integer.valueOf(r1.getResults().size()).compareTo(r2.getResults().size()));
 		return stream;
 	}
 
@@ -147,6 +143,11 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 				.filter(result -> !config.isFilterNegatives() || result.getScore() > 0)
 				.limit(config.getParserLimit())
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public ParserConfiguration getConfig() {
+		return parserConfig;
 	}
 
 }
