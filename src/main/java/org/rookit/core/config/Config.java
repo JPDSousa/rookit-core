@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.rookit.crawler.config.MusicServiceConfig;
 import org.rookit.utils.resource.Resources;
 
 import com.google.gson.JsonIOException;
@@ -36,6 +37,8 @@ public class Config {
 	
 	private ParsingConfig parser;
 	
+	private MusicServiceConfig crawler;
+	
 	private Config() {}
 	
 	public DatabaseConfig getDatabase() {
@@ -44,6 +47,10 @@ public class Config {
 
 	public ParsingConfig getParsing() {
 		return getOrDefault(parser, new ParsingConfig());
+	}
+	
+	public MusicServiceConfig getCrawler() {
+		return getOrDefault(crawler, new MusicServiceConfig());
 	}
 
 }

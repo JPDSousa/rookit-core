@@ -2,7 +2,6 @@ package org.rookit.runner.actions;
 
 import org.extendedCLI.argument.Argument;
 import org.extendedCLI.argument.ArgumentEnum;
-import org.extendedCLI.argument.Arguments;
 import org.extendedCLI.argument.Requires;
 
 @SuppressWarnings("javadoc")
@@ -26,13 +25,6 @@ public enum ListOptions implements ArgumentEnum{
 	@Override
 	public int getGroupID() {
 		return groupId;
-	}
-	
-	public static Arguments createArguments() {
-		final Arguments arguments = Arguments.create();
-		arguments.addArguments(values());
-
-		return arguments;
 	}
 
 }

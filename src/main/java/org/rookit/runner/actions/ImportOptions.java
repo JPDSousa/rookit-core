@@ -2,12 +2,12 @@ package org.rookit.runner.actions;
 
 import org.extendedCLI.argument.Argument;
 import org.extendedCLI.argument.ArgumentEnum;
-import org.extendedCLI.argument.Arguments;
 import org.extendedCLI.argument.Requires;
 
 @SuppressWarnings("javadoc")
 public enum ImportOptions implements ArgumentEnum {
-	PATH(Argument.create("p", Requires.TRUE, "The content path to be imported."), 1);
+	PATH(Argument.create("p", Requires.TRUE, "The content path to be imported."), 1),
+	AUTO(Argument.create("a", Requires.FALSE, "Automatically chooses the first option in every parsing"), 2);
 
 	private final Argument argument;
 	private final int groupId;
@@ -25,13 +25,6 @@ public enum ImportOptions implements ArgumentEnum {
 	@Override
 	public int getGroupID() {
 		return groupId;
-	}
-	
-	public static Arguments createArguments() {
-		final Arguments arguments = Arguments.create();
-		arguments.addArguments(values());
-
-		return arguments;
 	}
 
 }

@@ -33,7 +33,7 @@ public class ImportAction extends AbstractCommand implements Command {
 	private final Config config;
 	
 	public ImportAction(DBManager db, Config config) {
-		super(ImportOptions.createArguments());
+		super(OptionUtils.createArguments(ImportOptions.values()));
 		validator = CoreValidator.getDefault();
 		this.db = db;
 		this.config = config;

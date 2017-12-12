@@ -28,7 +28,7 @@ public class ListAction extends AbstractCommand implements Command {
 	private final DBManager db;
 
 	public ListAction(DBManager db) {
-		super(ListOptions.createArguments());
+		super(OptionUtils.createArguments(ListOptions.values()));
 		this.validator = CoreValidator.getDefault();
 		this.db = db;
 	}

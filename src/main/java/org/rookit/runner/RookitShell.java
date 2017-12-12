@@ -11,6 +11,7 @@ import org.extendedCLI.exceptions.NoSuchCommandException;
 import org.rookit.core.config.Config;
 import org.rookit.core.config.DatabaseConfig;
 import org.rookit.mongodb.DBManager;
+import org.rookit.runner.actions.CrawlAction;
 import org.rookit.runner.actions.ImportAction;
 import org.rookit.runner.actions.ListAction;
 import org.rookit.utils.log.Logs;
@@ -38,6 +39,7 @@ public class RookitShell {
 		builder.setOutput(System.out);
 		builder.registerCommand("import", new ImportAction(db, config));
 		builder.registerCommand("list", new ListAction(db));
+		builder.registerCommand("crawler", new CrawlAction(db));
 		return builder.build();
 		
 	}
