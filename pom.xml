@@ -63,17 +63,13 @@
 			<groupId>com.github.JPDSousa</groupId>
 			<artifactId>rookit-mongodb</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>com.github.JPDSousa</groupId>
-			<artifactId>rookit-parser</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>com.github.JPDSousa</groupId>
-			<artifactId>rookit-data-model</artifactId>
+			<artifactId>rookit-parser</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.JPDSousa</groupId>
-			<artifactId>ExtendedCLI</artifactId>
+			<artifactId>rookit-data-model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.JPDSousa</groupId>
@@ -83,6 +79,22 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.reactivex.rxjava2</groupId>
+			<artifactId>rxjava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.JPDSousa</groupId>
+			<artifactId>ExtendedCLI</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.JPDSousa</groupId>
+			<artifactId>rookit-web-crawler</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -104,14 +116,9 @@
 			</dependency>
 			<dependency>
 				<groupId>com.github.JPDSousa</groupId>
-				<artifactId>ExtendedCLI</artifactId>
-				<version>-SNAPSHOT</version>
-			</dependency>
-			<!--<dependency>
-				<groupId>com.github.JPDSousa</groupId>
 				<artifactId>rookit-parser</artifactId>
 				<version>-SNAPSHOT</version>
-			</dependency>-->
+			</dependency>
 			<dependency>
 				<groupId>com.github.JPDSousa</groupId>
 				<artifactId>rookit-data-model</artifactId>
@@ -122,6 +129,26 @@
 				<artifactId>junit</artifactId>
 				<version>4.12</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.reactivex.rxjava2</groupId>
+				<artifactId>rxjava</artifactId>
+				<version>2.1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>23.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.JPDSousa</groupId>
+				<artifactId>ExtendedCLI</artifactId>
+				<version>master-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.JPDSousa</groupId>
+				<artifactId>rookit-web-crawler</artifactId>
+				<version>-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
