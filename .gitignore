@@ -25,3 +25,7 @@ db\.bat
 Data/
 
 src/main/resources/config\.json
+
+audio_temp/
+
+crawler/
