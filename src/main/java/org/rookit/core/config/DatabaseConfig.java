@@ -14,7 +14,7 @@ public class DatabaseConfig {
 	
 	static {
 		DEFAULT_OPTIONS.put("host", "localhost");
-		DEFAULT_OPTIONS.put("port", "27039");
+		DEFAULT_OPTIONS.put("port", "27020");
 		DEFAULT_OPTIONS.put("db_name", "rookit");
 	}
 	
