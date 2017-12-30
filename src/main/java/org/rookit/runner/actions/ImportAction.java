@@ -1,5 +1,7 @@
 package org.rookit.runner.actions;
 
+import static org.rookit.utils.print.TypeFormat.TITLE;
+import static org.rookit.dm.utils.PrintUtils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,18 +22,20 @@ import org.rookit.core.utils.TrackPathNormalizer;
 import org.rookit.mongodb.DBManager;
 import org.rookit.dm.parser.IgnoreField;
 import org.rookit.dm.parser.TrackFormat;
-import org.rookit.dm.utils.PrintUtils;
 import org.rookit.parser.result.SingleTrackAlbumBuilder;
 import org.rookit.parser.utils.TrackPath;
 
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
+
 @SuppressWarnings("javadoc")
 public class ImportAction extends AbstractCommand implements Command {
-	
+
 	private final CoreValidator validator;
 	private final TrackParserGenerator parser;
 	private final DBManager db;
 	private final Config config;
-	
+
 	public ImportAction(DBManager db, Config config) {
 		super(OptionUtils.createArguments(ImportOptions.values()));
 		validator = CoreValidator.getDefault();
@@ -42,7 +46,7 @@ public class ImportAction extends AbstractCommand implements Command {
 	}
 
 	@Override
-	protected void execute(ExtendedCommandLine line) {
+	protected synchronized void execute(ExtendedCommandLine line) {
 		final Path path = Paths.get(line.getValue(ImportOptions.PATH));
 		if(Files.isDirectory(path)) {
 			importDirectory(path);
@@ -55,18 +59,17 @@ public class ImportAction extends AbstractCommand implements Command {
 	private void importDirectory(Path path) {
 		parser.generate(path).forEach(this::handleResult);
 	}
-	
+
 	private void importTrack(Path path) {
 		final TrackPath source = TrackPath.create(path);
 		handleResult(new TPGResult(source, parser.parseAll(source)));
 	}
-	
+
 	private void handleResult(TPGResult result) {
 		int index;
 		int choice;
 		final TrackPath source = result.getSource();
 		final List<SingleTrackAlbumBuilder> results = result.getResults();
-		final SingleTrackAlbumBuilder finalResult;
 		try {
 			output.println("Parsing: " + source);
 			index = 1;
@@ -76,11 +79,12 @@ public class ImportAction extends AbstractCommand implements Command {
 			if(!results.isEmpty()) {
 				choice = Character.getNumericValue(input.readLine().charAt(0));
 				if(choice > 0){
-					finalResult = results.get(choice-1);
-					new TrackPathNormalizer(source).removeTags();
-					db.addAlbum(finalResult.build());
-					updateHits(finalResult);
-					askForRemoval(source);
+					choose(source, results.get(choice-1));
+					for(int i = 0; i < results.size(); i++) {
+						if(i != choice-1) {
+							results.get(i);
+						}
+					}
 				}
 			}
 			else {
@@ -91,26 +95,47 @@ public class ImportAction extends AbstractCommand implements Command {
 			validator.handleIOException(e);
 		}
 	}
-	
+
+	private void choose(TrackPath source, SingleTrackAlbumBuilder result) {
+		final Single<Boolean> dbOp = Single.fromCallable(() -> {
+			new TrackPathNormalizer(source).removeTags();
+			db.addAlbum(result.build());
+			updateHits(result);
+			return true;
+		}).observeOn(Schedulers.io());
+
+		Single.fromCallable(() -> {
+			return askForRemoval(source);
+		}).zipWith(dbOp, (one, another) -> one && another)
+		.subscribe(toDelete -> {
+			if(toDelete) {
+				Files.delete(source.getPath());
+			}
+		});
+	}
+
 	private void updateHits(SingleTrackAlbumBuilder result) {
 		result.getIgnored().forEach(i -> db.updateIgnored(IgnoreField.create(i)));
 		db.updateTrackFormat(TrackFormat.create(result.getFormat().toString()));
 	}
 
-	private void askForRemoval(TrackPath source) throws IOException {
+	private boolean askForRemoval(TrackPath source) throws IOException {
 		final Remove removeConfig = config.getParsing().getOnSuccess().getRemove();
 		String answer;
 		if(removeConfig == Remove.ALWAYS) {
-			Files.delete(source.getPath());
+			return true;
 		}
 		else if(removeConfig == Remove.ASK) {
+			boolean toDelete = false;
 			do {
-				output.println("Remove the file (y/n)?");
+				output.println("Remove " + source.getPath() + " (y/n)?");
 				answer = input.readLine();
-				if(answer.equals("y")) {
-					Files.delete(source.getPath());
-				}
+				toDelete = answer.equals("y");
 			} while (!answer.equals("y") && !answer.equals("n"));
+			return toDelete;
+		}
+		else {
+			return false;
 		}
 	}
 
@@ -118,8 +143,32 @@ public class ImportAction extends AbstractCommand implements Command {
 		final StringBuilder builder = new StringBuilder().append(index)
 				.append(" :: ").append(result.getFormat())
 				.append(": [").append(result.getScore()).append("]\n")
-				.append(PrintUtils.track(result.getTrack()));
+				.append(toString(result));
 		output.println(builder.toString());
+	}
+
+	private String toString(SingleTrackAlbumBuilder result) {
+		final StringBuilder builder = new StringBuilder()
+				.append('[').append(result.getType()).append(':').append(result.getId()).append("] ")
+				.append(result.getTitle()).append('\n')
+				.append("Content: ").append(result.getPath() != null ? "Yes" : "No").append('\n')
+				.append("Main Artists: ").append(
+						getIterableAsString(result.getMainArtists(), TITLE, "none"))
+				.append('\n')
+				.append("Features: ").append(
+						getIterableAsString(result.getFeatures(), TITLE, "none"))
+				.append('\n')
+				.append("Producers: ").append(
+						getIterableAsString(result.getProducers(), TITLE, "none"))
+				.append('\n')
+				.append("Duration: ").append(duration(result.getDuration())).append('\n');
+		if(result.isVersion()) {
+			builder.append("Version [").append(result.getTypeVersion())
+			.append("](").append(result.getVersionToken()).append("): ")
+			.append(getIterableAsString(result.getVersionArtists(), TITLE, "none"))
+			.append('\n');
+		}
+		return builder.toString();
 	}
 
 	@Override
