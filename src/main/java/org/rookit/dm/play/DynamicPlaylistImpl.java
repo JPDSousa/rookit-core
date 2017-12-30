@@ -1,60 +1,66 @@
 package org.rookit.dm.play;
 
-import static org.rookit.dm.play.DatabaseFields.*;
+import static org.rookit.dm.play.TypePlaylist.DYNAMIC;
 
 import java.util.stream.Stream;
 
+import org.mongodb.morphia.annotations.Entity;
 import org.rookit.dm.track.Track;
 import org.rookit.dm.track.audio.TrackKey;
 import org.rookit.dm.track.audio.TrackMode;
-import org.smof.annnotations.SmofBoolean;
-import org.smof.annnotations.SmofNumber;
-import org.smof.annnotations.SmofString;
+import org.rookit.mongodb.DBManager;
+import org.rookit.mongodb.queries.TrackQuery;
 
-class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlaylist {
+@SuppressWarnings("javadoc")
+@Entity("Playlist")
+public class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlaylist {
+
+	private static final int LIMIT = 50;
 
 	// Audio features
-	@SmofNumber(name = BPM)
 	private short bpm;
+	private short bpmGap;
 
-	@SmofString(name = KEY)
 	private TrackKey trackKey;
 
-	@SmofString(name = MODE)
 	private TrackMode trackMode;
 
-	@SmofBoolean(name = INSTRUMENTAL)
-	private boolean isInstrumental;
+	private Boolean isInstrumental;
 
-	@SmofBoolean(name = LIVE)
-	private boolean isLive;
+	private Boolean isLive;
 
-	@SmofBoolean(name = ACOUSTIC)
-	private boolean isAcoustic;
+	private Boolean isAcoustic;
 
-	@SmofNumber(name = DANCEABILITY)
 	private double danceability;
+	private float danceabilityGap;
 
-	@SmofNumber(name = ENERGY)
 	private double energy;
+	private float energyGap;
 
-	@SmofNumber(name = VALENCE)
 	private double valence;
-
-	DynamicPlaylistImpl(String name) {
-		super(name);
+	private float valenceGap;
+	
+	private transient DBManager db;
+	
+	@SuppressWarnings("unused")
+	private DynamicPlaylistImpl() {
+		this(null);
 	}
 
-	@Override
-	public StaticPlaylist freeze() {
-		// TODO Auto-generated method stub
-		return null;
+	public DynamicPlaylistImpl(String name) {
+		super(DYNAMIC, name);
+		bpm = -1;
+		bpmGap = 10;
+		danceability = -1;
+		danceabilityGap = 0.2f;
+		energy = -1;
+		energyGap = 0.1f;
+		valence = -1;
+		valenceGap = 0.1f;
 	}
-
-	@Override
-	public StaticPlaylist freeze(int limit) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public void setDatabase(DBManager db) {
+		this.db = db;
 	}
 
 	@Override
@@ -91,34 +97,34 @@ class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlaylist {
 	}
 
 	@Override
-	public boolean isInstrumental() {
+	public Boolean isInstrumental() {
 		return isInstrumental;
 	}
 
 	@Override
-	public Void setInstrumental(boolean isInstrumental) {
+	public Void setInstrumental(Boolean isInstrumental) {
 		this.isInstrumental = isInstrumental;
 		return null;
 	}
 
 	@Override
-	public boolean isLive() {
+	public Boolean isLive() {
 		return isLive;
 	}
 
 	@Override
-	public Void setLive(boolean isLive) {
+	public Void setLive(Boolean isLive) {
 		this.isLive = isLive;
 		return null;
 	}
 
 	@Override
-	public boolean isAcoustic() {
+	public Boolean isAcoustic() {
 		return isAcoustic;
 	}
 
 	@Override
-	public Void setAcoustic(boolean isAcoustic) {
+	public Void setAcoustic(Boolean isAcoustic) {
 		this.isAcoustic = isAcoustic;
 		return null;
 	}
@@ -158,7 +164,85 @@ class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlaylist {
 
 	@Override
 	public Stream<Track> streamTracks() {
-		// TODO Auto-generated method stub
+		final TrackQuery query = db.getTracks();
+		setBpm(query);
+		setTrackKey(query);
+		setTrackMode(query);
+		setInstrumental(query);
+		setLive(query);
+		setAcoustic(query);
+		setDanceability(query);
+		setEnergy(query);
+		setValence(query);
+		
+		// TODO use other props
+		return query.stream();
+	}
+
+	private void setValence(TrackQuery query) {
+		if(valence > 0) {
+			query.withValence(valence-(valenceGap/2), 
+					valence+(valenceGap/2));
+		}
+	}
+
+	private void setDanceability(TrackQuery query) {
+		if(danceability > 0) {
+			query.withDanceability(danceability-(danceabilityGap/2), 
+					danceability+(danceabilityGap/2));
+		}
+	}
+
+	private void setEnergy(TrackQuery query) {
+		if(energy > 0) {
+			query.withEnergy(energy-(energyGap/2), energy+(energyGap/2));
+		}
+	}
+
+	private void setAcoustic(TrackQuery query) {
+		if(isAcoustic != null) {
+			query.withAcoustic(isAcoustic);
+		}
+	}
+
+	private void setLive(TrackQuery query) {
+		if(isLive != null) {
+			query.withLive(isLive);
+		}
+	}
+
+	private void setInstrumental(TrackQuery query) {
+		if(isInstrumental != null) {
+			query.withInstrumental(isInstrumental);
+		}
+	}
+
+	private void setTrackMode(TrackQuery query) {
+		if(trackMode != null) {
+			query.withTrackMode(trackMode);
+		}
+	}
+
+	private void setTrackKey(TrackQuery query) {
+		if(trackKey != null) {
+			query.withTrackKey(trackKey);
+		}
+	}
+
+	private void setBpm(TrackQuery query) {
+		if(bpm > 0) {
+			query.withBPM((short) (bpm-(bpmGap/2)), (short) (bpm+(bpmGap/2)));
+		}
+	}
+
+	@Override
+	public StaticPlaylist freeze() {
+		return freeze(LIMIT);
+	}
+
+	@Override
+	public StaticPlaylist freeze(int limit) {
+		
 		return null;
 	}
 
