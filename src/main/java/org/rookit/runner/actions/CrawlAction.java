@@ -11,15 +11,15 @@ import org.rookit.mongodb.DBManager;
 
 @SuppressWarnings("javadoc")
 public class CrawlAction extends AbstractCommand implements Command {
-	
+
 	private final CoreValidator validator;
 	private final RookitCrawler crawler;
 	private final DBManager db;
-	
-	public CrawlAction(DBManager db) {
+
+	public CrawlAction(DBManager db, RookitCrawler crawler) {
 		super(Arguments.create());
 		validator = CoreValidator.getDefault();
-		crawler = new RookitCrawler();
+		this.crawler = crawler;
 		this.db = db;
 	}
 
@@ -27,8 +27,25 @@ public class CrawlAction extends AbstractCommand implements Command {
 	protected void execute(ExtendedCommandLine line) {
 		db.getTracks().stream().forEach(track -> {
 			validator.info("Validating: " + track.getLongFullTitle());
-			crawler.fillTrack(track);
-			System.err.println(PrintUtils.track(track));
+			System.out.println("==== Before ====\n"
+					+ track.getExternalMetadata() + "\n"
+					+ PrintUtils.track(track));
+			crawler.fillTrack(track).subscribe(() -> {
+				System.out.println("==== Another one ====\n"
+						+ track.getExternalMetadata() + "\n"
+						+ PrintUtils.track(track)
+						+ "Danceability: " + track.getDanceability()
+						+ "\nValence: " + track.getValence()
+						+ "\nEnergy: " + track.getEnergy()
+						+ "\nBPM: " + track.getBPM()
+						+ "\nKey: " + track.getTrackKey()
+						+ "\nMode: " + track.getTrackMode()
+						//+ "\nIntrumental: " + track.isInstrumental()
+						+ "\nAcoustic: " + track.isAcoustic()
+						+ "\nLive: " + track.isLive());
+				db.replaceTrack(track);
+			});
+			
 		});
 	}
 
@@ -36,5 +53,5 @@ public class CrawlAction extends AbstractCommand implements Command {
 	public void undo() {
 		throw new RuntimeException("Not implemented yet!");
 	}
-	
+
 }
