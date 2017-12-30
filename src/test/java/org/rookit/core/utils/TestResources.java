@@ -17,7 +17,7 @@ public class TestResources {
 	public static final Path TRACKS = Resources.RESOURCES_TEST.resolve("tracks");
 	public static final Path FORMATS = Resources.RESOURCES_TEST.resolve("parser").resolve("formats.txt");
 
-	private static final DBManager DB = DBManager.open("localhost", 27039, "test");
+	private static final DBManager DB = DBManager.open("localhost", 27020, "rookit-core");
 	
 	public static final DBManager getDBConnection() {
 		return DB;
