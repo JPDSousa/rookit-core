@@ -25,6 +25,7 @@ package org.rookit.core.stream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -44,13 +45,12 @@ import org.rookit.parser.utils.PathUtils;
 import org.rookit.parser.utils.TrackPath;
 import org.rookit.utils.builder.StreamGenerator;
 
-
 @SuppressWarnings("javadoc")
 public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, Parser<TrackPath, SingleTrackAlbumBuilder>, AutoCloseable {
-	
+
 	private final CoreValidator validator;
 
-	private Stream<TPGResult> stream;
+	private Stream<Path> stream;
 	private final Parser<TrackPath, SingleTrackAlbumBuilder> parser;
 	private final ParserFactory factory;
 	private final ParsingConfig config;
@@ -82,7 +82,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 				.withTrackFormats(readFormats(config).getAll().collect(Collectors.toList()))
 				.withLimit(config.getParserLimit());
 	}
-	
+
 	private FormatList readFormats(ParsingConfig config) {
 		try {
 			return FormatList.readFromPath(config.getFormatsPath());
@@ -94,14 +94,13 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 
 	@Override
 	public Stream<TPGResult> generate(Path source) {
-		stream = list(source)
+		stream = list(source);
+		return stream
 				//filters tracks
 				.filter(DirectoryFilters.newTrackStreamFilter())
 				// TODO filter track by format
 				.map(p -> TrackPath.create(p))
-				.map(p -> new TPGResult(p, parseAll(p)))
-				.sorted((r1, r2) -> Integer.valueOf(r1.getResults().size()).compareTo(r2.getResults().size()));
-		return stream;
+				.map(p -> new TPGResult(p, parseAll(p)));
 	}
 
 	private Stream<Path> list(Path source) {
@@ -119,12 +118,12 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	}
 
 	@Override
-	public SingleTrackAlbumBuilder parse(TrackPath arg0) {
+	public Optional<SingleTrackAlbumBuilder> parse(TrackPath arg0) {
 		return parser.parse(arg0);
 	}
 
 	@Override
-	public <O extends Result<?>> SingleTrackAlbumBuilder parse(TrackPath arg0, O arg1) {
+	public <O extends Result<?>> Optional<SingleTrackAlbumBuilder> parse(TrackPath arg0, O arg1) {
 		return parser.parse(arg0, arg1);
 	}
 
@@ -137,7 +136,7 @@ public class TrackParserGenerator implements StreamGenerator<Path, TPGResult>, P
 	public <O extends Result<?>> Iterable<SingleTrackAlbumBuilder> parseAll(TrackPath arg0, O arg1) {
 		return filter(parser.parseAll(arg0, arg1));
 	}
-	
+
 	private Iterable<SingleTrackAlbumBuilder> filter(Iterable<SingleTrackAlbumBuilder> results) {
 		return StreamSupport.stream(results.spliterator(), false)
 				.filter(result -> !config.isFilterNegatives() || result.getScore() > 0)
