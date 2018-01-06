@@ -10,6 +10,8 @@ import org.rookit.dm.track.audio.TrackKey;
 import org.rookit.dm.track.audio.TrackMode;
 import org.rookit.mongodb.DBManager;
 import org.rookit.mongodb.queries.TrackQuery;
+import org.rookit.mongodb.utils.Order;
+import org.rookit.mongodb.utils.Order.TypeOrder;
 
 @SuppressWarnings("javadoc")
 @Entity("Playlist")
@@ -165,6 +167,8 @@ public class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlay
 	@Override
 	public Stream<Track> streamTracks() {
 		final TrackQuery query = db.getTracks();
+		final Order order = Order.create();
+		order.addField(PLAYS, TypeOrder.DSC);
 		setBpm(query);
 		setTrackKey(query);
 		setTrackMode(query);
@@ -176,7 +180,8 @@ public class DynamicPlaylistImpl extends AbstractPlaylist implements DynamicPlay
 		setValence(query);
 		
 		// TODO use other props
-		return query.stream();
+		// TODO order by plays[DSC], release data[DSC]
+		return query.order(order).stream();
 	}
 
 	private void setValence(TrackQuery query) {
